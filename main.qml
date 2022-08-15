@@ -21,8 +21,8 @@ ApplicationWindow {
         id: page1
         button.onClicked: {
             backend.shot()
-            image.source = ''
-            image.source = 'test.jpg'
+            // image.source = ""
+            image.source = "image://myprovider/test"+Math.random()
         }
     }
 }

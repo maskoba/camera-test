@@ -9,14 +9,17 @@ import time
 from datetime import datetime
 import signal
 
-from PySide2.QtGui import QGuiApplication
+from PySide2.QtGui import QGuiApplication,QImage,QPixmap
 from PySide2.QtQml import QQmlApplicationEngine
 from PySide2.QtCore import QObject, Signal, Property, QUrl, Slot
 from PySide2.QtWidgets import *
+from PySide2.QtQuick import *
+from PySide2.QtQml import *
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import gspread
+import cv2
 
 SCOPE = [
     'https://www.googleapis.com/auth/spreadsheets',
@@ -25,6 +28,25 @@ SCOPE = [
 JSON_FILE_PATH = 'pyramid-vision-4b762634fb0b.json'     #　各自の環境に合わせてください（Google Cloud Platformのサービスアカウントを使います）
 FILE_ID = '1Pqm0L5dAddBl23gB8nigj3h3k9Y-JTYQ'           #　各自の環境に合わせてください（画像保存フォルダのIDです）
 sheet_name = '画像データベース'                             #　各自の環境に合わせてください（Spread Sheetのファイル名です）
+
+class MyImageProvider(QQuickImageProvider):
+    def __init__(self):
+        super(MyImageProvider, self).__init__(QQuickImageProvider.Pixmap)
+
+    def requestPixmap(self, id, size, requestedSize):
+        print(requestedSize.width(),requestedSize.height())
+        img_path = 'test.jpg'
+        bgr_img = cv2.imread(img_path)
+        rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+        # self.bgr_img = bgr_img.copy()
+        # cv2.imwrite('output.png', self.btn_img, [int(cv2.IMWRITE_PNG_COMPRESSION),1])
+        # 入力画像表示
+        inp_img = cv2.resize(rgb_img, (requestedSize.width(),requestedSize.height())) 
+        h, w = inp_img.shape[:2]
+        bytesPerLine = inp_img.strides[0]
+        qimg = QImage(inp_img.data, w, h, bytesPerLine, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(qimg)
+        return pixmap
 
 def func():
     subprocess.call(split('libcamera-still -t 0 --info-text "Focus : %focus" -p 0,0,960,720 -o test.jpg -s'))
@@ -79,6 +101,7 @@ if __name__ == "__main__":
     backend = Backend()
     # backend クラスを QML の backend としてバインディングする
     engine.rootContext().setContextProperty("backend", backend)
+    engine.addImageProvider("myprovider", MyImageProvider())
     engine.load(os.path.join(os.path.dirname(__file__), "main.qml"))
 
     if not engine.rootObjects():

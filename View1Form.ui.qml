@@ -26,9 +26,9 @@ Item {
         y: 0
         width: 640
         height: 480
-        source: "test.jpg"
-        sourceSize.height: 3040
-        sourceSize.width: 4056
+        source: "image://myprovider/test"
+        sourceSize.height: 300
+        sourceSize.width: 400
         fillMode: Image.PreserveAspectFit
     }
 }
