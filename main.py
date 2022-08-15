@@ -34,7 +34,7 @@ class MyImageProvider(QQuickImageProvider):
         super(MyImageProvider, self).__init__(QQuickImageProvider.Pixmap)
 
     def requestPixmap(self, id, size, requestedSize):
-        print(requestedSize.width(),requestedSize.height())
+        # print(requestedSize.width(),requestedSize.height())
         img_path = 'test.jpg'
         bgr_img = cv2.imread(img_path)
         rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
