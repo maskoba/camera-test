@@ -22,7 +22,7 @@ ApplicationWindow {
         button.onClicked: {
             backend.shot()
             // image.source = ""
-            image.source = "image://myprovider/test"+Math.random()
+            image.source = "image://myprovider/"+Math.random()
         }
     }
 }
